@@ -6,7 +6,7 @@ This repository contains the deliverables for the Data Warehousing Final Project
 - SQL queries and reports for generating insights.
 
 ## Directory Structure
-
+```
 ETL-Data-Warehoure/
 ├── README.md              # Project overview and setup instructions
 ├── .gitignore             # Ignored files and directories
@@ -32,7 +32,7 @@ ETL-Data-Warehoure/
 │   └── api_config.json    # API keys and configurations
 └── reports/               # Generated reports and analysis
     └── stats_report.md    # Summary of findings and insights
-
+```
 ## Setup Instructions
 1. Clone the repository:
    ```bash
