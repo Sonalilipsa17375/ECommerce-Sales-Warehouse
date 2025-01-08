@@ -1,11 +1,14 @@
-# Data Warehousing Final Project
+# **ETL and Data Warehouse for E-Commerce Analytics**
 
-This repository contains the deliverables for the Data Warehousing Final Project, including:
-- Python scripts for ETL (data ingestion, transformation, modeling).
-- A PostgreSQL data warehouse schema (star/snowflake).
-- SQL queries and reports for generating insights.
+This repository demonstrates the development of an end-to-end ETL pipeline and a data warehouse for analyzing e-commerce sales data. The project includes extracting, transforming, and loading data from an API, designing a relational data warehouse schema, and generating insights to support decision-making.
 
-## Directory Structure
+## Key Features
+- **Data Ingestion**: Automated data retrieval from the [Fake Store API](https://fakestoreapi.com/).
+- **Data Transformation**: Cleaning and normalizing raw data into structured tables.
+- **Data Warehousing**: Implementation of a star schema in PostgreSQL for efficient analytics.
+- I**nsights Generation**: SQL queries and Python scripts for actionable insights.
+
+## Project Structure
 ```
 ETL-Data-Warehoure/
 ├── README.md              # Project overview and setup instructions
@@ -33,6 +36,26 @@ ETL-Data-Warehoure/
 └── reports/               # Generated reports and analysis
     └── stats_report.md    # Summary of findings and insights
 ```
+
+## ETL Pipeline Overview
+1. **Data Source**: Data is retrieved from the [Fake Store API](https://fakestoreapi.com/), providing information on:
+    - **Products**: Titles, categories, prices, ratings.
+    - **Users**: Customer details.
+    - **Carts**: Order history and quantities.
+    - **Categories**: Product categories.
+2. **Ingestion**: The `ingestion.py` script fetches and stores raw JSON/CSV files in the `data/raw/` directory.
+3. **Transformation**: The `transformation.py` script normalizes and cleans the raw data for loading into the warehouse.
+4. **Data Warehouse**:
+    - Schema: Designed as a star schema for fast and efficient querying.
+    - Fact Table: `sales`.
+    - Dimension Tables: `users`, `products`, `categories`, and `time`.
+5. **Insights**: Key statistics and trends are generated using SQL queries and Python.
+
+## Insights and Use Cases
+- Total revenue by product category.
+- Top customers by purchase amount.
+- Sales trends over time (daily, monthly, yearly).
+  
 ## Setup Instructions
 1. Clone the repository:
    ```bash
