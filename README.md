@@ -71,7 +71,7 @@ ETL-Data-Warehoure/
 
 ## Contributors
 
-- **Walid Alsafadi**
-- **Ameer Alzerei**
-- **Hamza Obaid**
-- **Hazem Muanes**
+- [**Walid Alsafadi**](https://github.com/WalidAlsafadi) 
+- [**Ameer Alzerei**](https://github.com/AmeerAlzerei)
+- [**Hamza Obaid**](https://github.com/hobaid1) 
+- [**Hazem Muanes**](https://github.com/HazemMuanes)
