@@ -11,7 +11,10 @@ DB_DETAILS = {
     "port": "5432"
 }
 
-# Resolve paths dynamically based on the current working directory
+# Path to the SQL schema file
+SCHEMA_FILE = "sql/dw_schema.sql"
+
+# Paths to processed CSV files
 BASE_DIR = os.getcwd()  # Project root directory
 FILE_PATHS = {
     "categories": os.path.join(BASE_DIR, "data", "processed", "dimension_categories.csv"),
@@ -21,67 +24,81 @@ FILE_PATHS = {
     "address": os.path.join(BASE_DIR, "data", "processed", "dimension_address.csv"),
 }
 
-def check_files_exist():
+def create_tables():
     """
-    Check if all required files exist.
+    Connect to PostgreSQL and create tables using the SQL script from dw_schema.sql.
     """
-    for table, path in FILE_PATHS.items():
-        print(f"Checking {table} file at: {path}")
-        if not os.path.exists(path):
-            print(f"ERROR: File not found for {table}: {path}")
-            return False
-        else:
-            print(f"File found for {table}: {path}")
-    return True
+    try:
+        # Read the SQL script from the file
+        with open(SCHEMA_FILE, "r") as file:
+            create_tables_sql = file.read()
+
+        # Connect to the PostgreSQL database
+        conn = psycopg2.connect(**DB_DETAILS)
+        cursor = conn.cursor()
+
+        # Execute the SQL script
+        cursor.execute(create_tables_sql)
+        conn.commit()
+        print("Tables created successfully.")
+    except Exception as e:
+        print(f"Error creating tables: {e}")
+    finally:
+        if 'conn' in locals():
+            conn.close()
+            print("Connection closed.")
 
 def load_csv_to_postgres(file_path, table_name, conn):
     """
     Load a CSV file into a PostgreSQL table.
     """
     print(f"Loading data into {table_name} from {file_path}...")
-    # Read the CSV file into a DataFrame
-    df = pd.read_csv(file_path)
-
-    # Generate a list of tuples from the DataFrame
-    data = list(df.itertuples(index=False, name=None))
-
-    # Generate the INSERT statement dynamically
-    columns = ", ".join(df.columns)
-    placeholders = ", ".join(["%s"] * len(df.columns))
-    query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-
-    # Execute the INSERT statement
-    with conn.cursor() as cursor:
-        cursor.executemany(query, data)
-        conn.commit()
-    print(f"Data loaded into {table_name} successfully.")
-
-def main():
-    """
-    Main function to validate files and load data into PostgreSQL.
-    """
-    # Validate file paths
-    if not check_files_exist():
-        print("File validation failed. Exiting...")
-        return
-
-    # Connect to the PostgreSQL database
     try:
+        # Read the CSV file into a DataFrame
+        df = pd.read_csv(file_path)
+
+        # Generate a list of tuples from the DataFrame
+        data = list(df.itertuples(index=False, name=None))
+
+        # Generate the INSERT statement dynamically
+        columns = ", ".join(df.columns)
+        placeholders = ", ".join(["%s"] * len(df.columns))
+        query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+
+        # Execute the INSERT statement
+        with conn.cursor() as cursor:
+            cursor.executemany(query, data)
+            conn.commit()
+        print(f"Data loaded into {table_name} successfully.")
+    except Exception as e:
+        print(f"Error loading data into {table_name}: {e}")
+
+def insert_data():
+    """
+    Validate files and load data into PostgreSQL tables.
+    """
+    try:
+        # Connect to PostgreSQL
         conn = psycopg2.connect(**DB_DETAILS)
         print("Database connection successful.")
 
         # Load data into each table
-        load_csv_to_postgres(FILE_PATHS["categories"], "Categories", conn)
-        load_csv_to_postgres(FILE_PATHS["products"], "Products", conn)
-        load_csv_to_postgres(FILE_PATHS["address"], "Address", conn)
-        load_csv_to_postgres(FILE_PATHS["users"], "Users", conn)
-        load_csv_to_postgres(FILE_PATHS["carts"], "Carts", conn)
+        load_csv_to_postgres(FILE_PATHS["categories"], "categories", conn)
+        load_csv_to_postgres(FILE_PATHS["products"], "products", conn)
+        load_csv_to_postgres(FILE_PATHS["address"], "address", conn)
+        load_csv_to_postgres(FILE_PATHS["users"], "users", conn)
+        load_csv_to_postgres(FILE_PATHS["carts"], "carts", conn)
 
     except Exception as e:
-        print(f"Database error: {e}")
+        print(f"Error inserting data: {e}")
     finally:
-        conn.close()
-        print("Connection closed.")
+        if 'conn' in locals():
+            conn.close()
+            print("Connection closed.")
 
 if __name__ == "__main__":
-    main()
+    print("Creating tables...")
+    create_tables()
+
+    print("\nInserting data into tables...")
+    insert_data()
