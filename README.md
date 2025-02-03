@@ -67,11 +67,11 @@ ETL-Data-Warehoure/
    pip install -r requirements.txt
    ```
 
-3. Configure database and API details in `config/`.
+3. Configure database and API details in `config/`
 
 ## Contributors
 
-- **Walid Alsafadi**
-- **Ameer Alzerei**
-- **Hamza Obaid**
-- **Hazem Muanes**
+- [**Walid Alsafadi**](https://github.com/WalidAlsafadi) 
+- [**Ameer Alzerei**](https://github.com/AmeerAlzerei)
+- [**Hamza Obaid**](https://github.com/hobaid1) 
+- [**Hazem Muanes**](https://github.com/HazemMuannes)
