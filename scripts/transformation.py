@@ -85,17 +85,22 @@ cart_items = {}
 for cart in carts:
     cart_id = cart["id"]
     user_id = cart["userId"]
-    cart_total_price = 0
-    distinct_products_in_cart = len(cart["products"])
+    cart_total_price = 0  # Initialize cart total price
+    distinct_products_in_cart = len(cart["products"])  # Count distinct products in the cart
     for product in cart["products"]:
         product_id = product["productId"]
         quantity = product["quantity"]
         price = product_dimension.loc[product_dimension["product_id"] == product_id, "price"].values[0]
-        product_total_price = price * quantity
+        product_total_price = price * quantity  # Calculate the total price for this product
         
+        # Accumulate the product's total price to the cart's total price
+        cart_total_price += product_total_price
+        
+        # Get product ratings
         rating_count = products[product_id - 1]["rating"]["count"]
         rating_rate = products[product_id - 1]["rating"]["rate"]
         
+        # Append the record to the sales fact table
         sales_fact_table.append({
             "sales_id": len(sales_fact_table) + 1,
             "product_id": product_id,
@@ -106,14 +111,15 @@ for cart in carts:
             "product_total_price": product_total_price,
             "rating_count": rating_count,
             "rating_rate": rating_rate,
-            "total_cart_price": None,  # Placeholder
-            "distinct_products_in_cart": None  # Placeholder
+            "total_cart_price": None,  # Placeholder (will update later)
+            "distinct_products_in_cart": None  # Placeholder (will update later)
         })
     
+    # Save the total cart price and the number of distinct products for this cart
     cart_prices[cart_id] = cart_total_price
     cart_items[cart_id] = distinct_products_in_cart
 
-# Add cart-level data to sales fact table
+# Update cart-level data in the sales fact table
 for row in sales_fact_table:
     row["total_cart_price"] = cart_prices[row["cart_id"]]
     row["distinct_products_in_cart"] = cart_items[row["cart_id"]]
