@@ -1,16 +1,17 @@
 import os
+import json
 import pandas as pd
 import psycopg2
 from psycopg2 import sql
 
-# Database connection configuration
-DB_CONFIG = {
-    "dbname": "sales_analytics",
-    "user": "postgres",
-    "password": "123123", # This password is exclusive to the local machine used to run the script
-    "host": "localhost",
-    "port": 5432
-}
+# Load database configuration from JSON file
+CONFIG_FILE = "config/db_config.json"
+
+def load_db_config():
+    with open(CONFIG_FILE, "r") as f:
+        return json.load(f)
+
+DB_CONFIG = load_db_config()
 
 # Paths to processed CSV files
 PROCESSED_DATA_PATH = "data/processed"
@@ -73,7 +74,6 @@ def load_csv_to_postgres(table_name, csv_filename):
 
             # Insert data using COPY (faster than INSERT)
             with open(csv_path, 'r') as f:
-                next(f)  # Skip header row
                 cur.copy_expert(f"COPY {table_name} FROM STDIN WITH CSV HEADER", f)
 
         conn.commit()
