@@ -6,7 +6,7 @@ This repository demonstrates the development of an end-to-end ETL pipeline and a
 - **Data Ingestion**: Automated data retrieval from the [Fake Store API](https://fakestoreapi.com/).
 - **Data Transformation**: Cleaning and normalizing raw data into structured tables.
 - **Data Warehousing**: Implementation of a star schema in PostgreSQL for efficient analytics.
-- I**nsights Generation**: SQL queries and Python scripts for actionable insights.
+- **Insights Generation**: SQL queries and Python scripts for actionable insights.
 
 ## Project Structure
 ```
