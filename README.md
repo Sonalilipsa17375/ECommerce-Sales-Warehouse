@@ -1,16 +1,18 @@
-# **ETL and Data Warehouse for E-Commerce Analytics**
+# **E-Commerce Sales Data Warehouse**
 
-This repository demonstrates the development of an end-to-end ETL pipeline and a data warehouse for analyzing e-commerce sales data. The project includes extracting, transforming, and loading data from an API, designing a relational data warehouse schema, and generating insights to support decision-making.
+This repository showcases the development of a complete ETL pipeline and a data warehouse tailored for e-commerce analytics. It includes data ingestion from APIs, data transformation, schema design in PostgreSQL, and the generation of business insights through SQL queries and Python visualizations. The project follows data engineering best practices and is documented with a comprehensive IEEE-style report.
 
-## Key Features
+## **Key Features**
 - **Data Ingestion**: Automated data retrieval from the [Fake Store API](https://fakestoreapi.com/).
-- **Data Transformation**: Cleaning and normalizing raw data into structured tables.
-- **Data Warehousing**: Implementation of a star schema in PostgreSQL for efficient analytics.
-- I**nsights Generation**: SQL queries and Python scripts for actionable insights.
+- **Data Transformation**: Cleaning, normalizing, and structuring raw data into relational tables.
+- **Data Warehousing**: Implementation of a star schema in PostgreSQL for efficient querying and analytics.
+- **Insights Generation**: SQL queries and Python scripts to generate actionable business insights.
+- **Documentation**: Detailed reports and documentation following professional standards.
+
 
 ## Project Structure
 ```
-ETL-Data-Warehoure/
+ECommerce-Sales-Warehouse/
 ├── README.md              # Project overview and setup instructions
 ├── .gitignore             # Ignored files and directories
 ├── .gitattributes         # Repository-specific attributes for file handling and language statistics
@@ -33,45 +35,82 @@ ETL-Data-Warehoure/
 ├── config/                # Configuration files for APIs and DB
 │   ├── db_config.json     # Database connection details
 │   └── api_config.json    # API keys and configurations
-└── reports/               # Generated reports and analysis
-    └── stats_report.md    # Summary of findings and insights
+├── reports/               # Generated reports and analysis
+│   ├── images/            # Project images and visualizations
+│   ├── final_report.pdf   # Comprehensive IEEE-style final report
+└── └── stats_report.md    # Summary of findings and insights
 ```
 
-## ETL Pipeline Overview
-1. **Data Source**: Data is retrieved from the [Fake Store API](https://fakestoreapi.com/), providing information on:
-    - **Products**: Titles, categories, prices, ratings.
-    - **Users**: Customer details.
-    - **Carts**: Order history and quantities.
-    - **Categories**: Product categories.
-2. **Ingestion**: The `ingestion.py` script fetches and stores raw JSON/CSV files in the `data/raw/` directory.
-3. **Transformation**: The `transformation.py` script normalizes and cleans the raw data for loading into the warehouse.
-4. **Data Warehouse**:
-    - Schema: Designed as a star schema for fast and efficient querying.
-    - Fact Table: `sales`.
-    - Dimension Tables: `users`, `products`, `categories`, and `time`.
-5. **Insights**: Key statistics and trends are generated using SQL queries and Python.
+## **ETL Pipeline Overview**
 
-## Insights and Use Cases
-- Total revenue by product category.
-- Top customers by purchase amount.
-- Sales trends over time (daily, monthly, yearly).
-  
-## Setup Instructions
-1. Clone the repository:
+1. **Data Source**:  
+   Data is retrieved from the [Fake Store API](https://fakestoreapi.com/), a publicly available API that simulates e-commerce data. The API provides various datasets:
+   - **Products**: Product titles, categories, prices, ratings, and descriptions.
+   - **Users**: Customer profiles, including names, contact details, and addresses.
+   - **Carts**: Order history detailing user purchases and quantities.
+   - **Categories**: Product classifications to group items effectively.
+
+2. **Ingestion**:  
+   The `ingestion.py` script automates data extraction from the API. Raw JSON data is saved in the `data/raw/` directory, preserving the original structure for reference and reproducibility.
+
+3. **Transformation**:  
+   The `transformation.py` script cleans and normalizes the ingested JSON data. Key transformations include:
+   - Flattening nested JSON fields (e.g., product ratings).
+   - Ensuring consistent data types for analytical readiness.
+   - Generating processed CSV files stored in the `data/processed/` directory.
+
+4. **Data Warehouse**:  
+   The PostgreSQL database follows a **star schema** design, optimizing the data for analytical queries and OLAP operations.
+   - **Fact Table**: `sales_fact_table` holds transactional data for all sales activities.
+   - **Dimension Tables**: 
+     - `user_dimension`: Customer details.
+     - `product_dimension`: Product specifications.
+     - `category_dimension`: Classification of products.
+     - `cart_dimension`: Purchase event metadata.
+
+   - **ERD Diagram**: [ERD.png](reports/images/ERD.png) provides a visual representation of the schema relationships.
+
+5. **Insights Generation**:  
+   Business insights are generated using SQL queries (`queries.sql`), and visualizations are created using Python in `stats.py`. The insights focus on sales performance, customer behavior, and category-specific trends.
+
+## **Setup Instructions**
+1. **Clone the repository**:
    ```bash
-   git clone https://github.com/WalidAlsafadi/ETL-Data-Warehouse
+   git clone https://github.com/YourGitHubUsername/ECommerce-Sales-Warehouse
    ```
 
-2. Install dependencies:
+2. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Configure database and API details in `config/`
+3. **Configure database and API details**:
+    - Edit the `config/db_config.json` file with your PostgreSQL credentials.
+    - Modify `config/api_config.json` if using different APIs.
 
-## Contributors
+4. **Run the ETL pipeline**:
+    ```bash
+    python scripts/ingestion.py
+    python scripts/transformation.py
+    python scripts/modeling.py
+    ```
+5. **Generate Insights**:
+    ```bash
+    python scripts/stats.py
+    ```
 
-- [**Walid Alsafadi**](https://github.com/WalidAlsafadi) 
-- [**Ameer Alzerei**](https://github.com/AmeerAlzerei)
-- [**Hamza Obaid**](https://github.com/hobaid1) 
-- [**Hazem Muanes**](https://github.com/HazemMuannes)
+## **Reports and Documentation**
+
+- [**Final Report**](reports/Design_and_Implementation_of_an_ETL_Pipeline_and_Data_Warehouse_for_E-Commerce_Business_Insights.pdf): Comprehensive IEEE-style documentation detailing the project workflow, challenges, and insights.
+- [**Business Insights**](reports/stats_report.md): Key findings and visualizations summarized.
+
+
+## **Contributors**
+
+- [**Walid K. W. Alsafadi**](https://github.com/WalidAlsafadi) 
+- [**Ameer T. F. Alzerei**](https://github.com/AmeerAlzerei)
+- [**Hamza M. H. Obaid**](https://github.com/hobaid1) 
+- [**Hazem A. A. Muanes**](https://github.com/HazemMuannes)
+
+## **License**
+This project is licensed under the [Apache License 2.0](LICENSE).

@@ -1,128 +1,70 @@
 import psycopg2
-import csv
-import os
+import json
+import pandas as pd
+import re
 
-# Database connection details
-DB_DETAILS = {
-    "dbname": "sales_dw",
-    "user": "postgres",
-    "password": "admin",
-    "host": "localhost",
-    "port": "5432"
-}
+# Database connection configuration
+CONFIG_FILE = "config/db_config.json"
+QUERIES_FILE = "sql/queries.sql"
 
-# Define the path for the insights folder
-BASE_DIR = os.getcwd()
-INSIGHTS_FOLDER = os.path.join(BASE_DIR, "data", "insights")
-
-# Ensure the insights folder exists
-os.makedirs(INSIGHTS_FOLDER, exist_ok=True)
-
-def connect_to_db():
-    """
-    Establish a connection to the PostgreSQL database.
-    """
+# Load database configuration
+def load_db_config():
     try:
-        conn = psycopg2.connect(**DB_DETAILS)
-        print("Database connection successful.")
-        return conn
-    except Exception as e:
-        print(f"Error connecting to database: {e}")
-        return None
+        with open(CONFIG_FILE, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"ERROR: Config file {CONFIG_FILE} not found.")
+        exit(1)
 
-def execute_query(conn, query):
-    """
-    Execute a SQL query and return the results.
-    """
+DB_CONFIG = load_db_config()
+
+# Function to read and parse SQL queries from file
+def load_queries():
+    queries = {}
     try:
-        with conn.cursor() as cursor:
-            cursor.execute(query)
-            results = cursor.fetchall()
-            return results
-    except Exception as e:
-        print(f"Error executing query: {e}")
-        return None
+        with open(QUERIES_FILE, "r") as f:
+            sql_content = f.read()
 
-def print_results(results, headers):
-    """
-    Display query results in a readable format.
-    """
-    print(f"\n{' | '.join(headers)}")
-    print("-" * (len(headers) * 15))
-    for row in results:
-        print(" | ".join(map(str, row)))
+        # Splitting queries using the comments as titles
+        query_blocks = re.split(r'-- Question: (.+)', sql_content)[1:]
 
-def save_to_csv(results, headers, filename):
-    """
-    Save query results to a CSV file in the insights folder.
-    """
+        for i in range(0, len(query_blocks), 2):
+            title = query_blocks[i].strip()
+            query = query_blocks[i + 1].strip()
+            queries[title] = query
+
+    except FileNotFoundError:
+        print(f"ERROR: Queries file {QUERIES_FILE} not found.")
+        exit(1)
+
+    return queries
+
+# Load SQL queries
+queries = load_queries()
+
+# Execute Queries and Display Results
+def run_queries():
     try:
-        with open(filename, "w", newline="") as file:
-            writer = csv.writer(file)
-            writer.writerow(headers)
-            writer.writerows(results)
-        print(f"Results saved to {filename}")
-    except Exception as e:
-        print(f"Error saving to CSV: {e}")
+        # Connect to PostgreSQL
+        conn = psycopg2.connect(**DB_CONFIG)
+        cur = conn.cursor()
 
-def main():
-    """
-    Main function to generate insights from the data warehouse.
-    """
-    conn = connect_to_db()
-    if not conn:
-        return
+        for title, query in queries.items():
+            print(f"\n Running Query: {title}")
+            cur.execute(query)
+            rows = cur.fetchall()
 
-    try:
-        # Total revenue per category
-        print("\nFetching total revenue per category...")
-        revenue_query = """
-        SELECT c.categories, SUM(p.price * cart.quantity) AS total_revenue
-        FROM Carts cart
-        JOIN Products p ON cart.productId = p.ProductsId
-        JOIN Categories c ON p.CategoryId = c.CategoryId
-        GROUP BY c.categories;
-        """
-        results = execute_query(conn, revenue_query)
-        if results:
-            headers = ["Category", "Total Revenue"]
-            print_results(results, headers)
-            save_to_csv(results, headers, os.path.join(INSIGHTS_FOLDER, "total_revenue_per_category.csv"))
+            # Convert to Pandas DataFrame for better display
+            colnames = [desc[0] for desc in cur.description]
+            df = pd.DataFrame(rows, columns=colnames)
 
-        # Top 5 selling products
-        print("\nFetching top 5 selling products...")
-        top_products_query = """
-        SELECT p.title, SUM(cart.quantity) AS total_sold
-        FROM Carts cart
-        JOIN Products p ON cart.productId = p.ProductsId
-        GROUP BY p.title
-        ORDER BY total_sold DESC
-        LIMIT 5;
-        """
-        results = execute_query(conn, top_products_query)
-        if results:
-            headers = ["Product", "Total Sold"]
-            print_results(results, headers)
-            save_to_csv(results, headers, os.path.join(INSIGHTS_FOLDER, "top_5_selling_products.csv"))
+            # Display dataframe
+            print(df)
 
-        # Sales trends over time
-        print("\nFetching sales trends over time...")
-        sales_trends_query = """
-        SELECT DATE_TRUNC('month', cart.date) AS sales_month, SUM(p.price * cart.quantity) AS total_revenue
-        FROM Carts cart
-        JOIN Products p ON cart.productId = p.ProductsId
-        GROUP BY sales_month
-        ORDER BY sales_month;
-        """
-        results = execute_query(conn, sales_trends_query)
-        if results:
-            headers = ["Sales Month", "Total Revenue"]
-            print_results(results, headers)
-            save_to_csv(results, headers, os.path.join(INSIGHTS_FOLDER, "sales_trends_over_time.csv"))
-
-    finally:
+        cur.close()
         conn.close()
-        print("Connection closed.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
-    main()
+    run_queries()
