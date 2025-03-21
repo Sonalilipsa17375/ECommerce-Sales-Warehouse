@@ -76,7 +76,7 @@ ECommerce-Sales-Warehouse/
 ## **Setup Instructions**
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/YourGitHubUsername/ECommerce-Sales-Warehouse
+   git clone https://github.com/WalidAlsafadi/ECommerce-Sales-Warehouse
    ```
 
 2. **Install dependencies**:
