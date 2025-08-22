@@ -104,13 +104,5 @@ ECommerce-Sales-Warehouse/
 - [**Final Report**](reports/Design_and_Implementation_of_an_ETL_Pipeline_and_Data_Warehouse_for_E-Commerce_Business_Insights.pdf): Comprehensive IEEE-style documentation detailing the project workflow, challenges, and insights.
 - [**Business Insights**](reports/stats_report.md): Key findings and visualizations summarized.
 
-
-## **Contributors**
-
-- [**Walid K. W. Alsafadi**](https://github.com/WalidAlsafadi) 
-- [**Ameer T. F. Alzerei**](https://github.com/AmeerAlzerei)
-- [**Hamza M. H. Obaid**](https://github.com/hobaid1) 
-- [**Hazem A. A. Muanes**](https://github.com/HazemMuannes)
-
 ## **License**
 This project is licensed under the [Apache License 2.0](LICENSE).
